@@ -1,0 +1,95 @@
+/* Custom styles for MiniVulnManager */
+
+/* Base styles for the hacker theme */
+body {
+    font-family: 'Source Code Pro', monospace;
+    background-color: #1a202c; /* Tailwind's gray-900 */
+    color: #48bb78; /* Tailwind's green-400 */
+}
+
+/* Glowing hover effect for buttons and links */
+.glow-hover {
+    position: relative;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.glow-hover:hover {
+    color: #76e4f7; /* Tailwind's cyan-400 */
+    text-shadow: 0 0 10px #76e4f7, 0 0 20px #76e4f7, 0 0 30px #76e4f7;
+}
+
+/* Table styles */
+table {
+    border-color: #48bb78; /* Tailwind's green-500 */
+}
+
+th, td {
+    border-color: #48bb78;
+}
+
+th {
+    background-color: #4a5568; /* Tailwind's gray-600 */
+    color: #48bb78;
+}
+
+/* Light theme overrides */
+body.bg-gray-100 {
+    background-color: #f7fafc; /* Tailwind's gray-100 */
+    color: #2d3748; /* Tailwind's gray-800 */
+}
+
+body.bg-gray-100 .glow-hover:hover {
+    color: #3182ce; /* Tailwind's blue-600 */
+    text-shadow: none;
+}
+
+body.bg-gray-100 table,
+body.bg-gray-100 th,
+body.bg-gray-100 td {
+    border-color: #e2e8f0; /* Tailwind's gray-300 */
+}
+
+body.bg-gray-100 th {
+    background-color: #e2e8f0;
+    color: #2d3748;
+}
+
+body.bg-gray-100 .bg-gray-800 {
+    background-color: #ffffff; /* White background for cards in light mode */
+}
+
+body.bg-gray-100 .bg-gray-700 {
+    background-color: #edf2f7; /* Tailwind's gray-200 */
+}
+
+body.bg-gray-100 .bg-gray-600 {
+    background-color: #e2e8f0;
+}
+
+body.bg-gray-100 .border-green-500 {
+    border-color: #3182ce; /* Tailwind's blue-600 */
+}
+
+body.bg-gray-100 .text-green-400 {
+    color: #2d3748;
+}
+
+body.bg-gray-100 .text-cyan-400 {
+    color: #3182ce;
+}
+
+body.bg-gray-100 .text-red-400 {
+    color: #e53e3e; /* Tailwind's red-600 */
+}
+
+body.bg-gray-100 .text-orange-400 {
+    color: #dd6b20; /* Tailwind's orange-600 */
+}
+
+body.bg-gray-100 .text-yellow-400 {
+    color: #d69e2e; /* Tailwind's yellow-600 */
+}
+
+body.bg-gray-100 .hover\:bg-gray-700:hover {
+    background-color: #edf2f7;
+}

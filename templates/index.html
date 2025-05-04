@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreadSentry - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body class="bg-gray-900 text-green-400 font-mono">
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="ThreadSentry Logo" class="h-8 w-8">
+                <h1 class="text-2xl font-semibold text-green-400">ThreadSentry</h1>
+            </div>
+            <nav class="space-x-6 flex items-center">
+                <a href="{{ url_for('index') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Dashboard</a>
+                <a href="{{ url_for('upload') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Upload Report</a>
+                <a href="{{ url_for('export_report') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Export Report</a>
+                <a href="{{ url_for('remediation_history') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Remediation History</a>
+                <button id="theme-toggle" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Toggle Theme</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="bg-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' if category == 'warning' else 'blue' }}-800 border border-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' if category == 'warning' else 'blue' }}-400 text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' if category == 'warning' else 'blue' }}-400 px-4 py-3 rounded mb-4">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Search Bar -->
+        <section class="mb-6">
+            <form action="{{ url_for('search') }}" method="get" class="flex space-x-4">
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search vulnerabilities..." class="border border-green-500 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-700 text-green-400">
+                <button type="submit" class="bg-green-600 text-gray-900 font-medium py-2 px-4 rounded-lg hover:bg-cyan-400 transition-colors glow-hover">Search</button>
+            </form>
+        </section>
+
+        <!-- Vulnerability Summary -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+                <h2 class="text-xl font-semibold text-green-400 mb-4">Total Vulnerabilities</h2>
+                <p class="text-4xl font-bold text-cyan-400">{{ deduplicated_vuln_count }}</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+                <h2 class="text-xl font-semibold text-green-400 mb-4">Attack Surface Score</h2>
+                <p class="text-4xl font-bold text-cyan-400">{{ attack_surface_score }}/100</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+                <h2 class="text-xl font-semibold text-green-400 mb-4">Attack Surface Factors</h2>
+                <ul class="list-disc list-inside text-green-400">
+                    {% for factor in attack_surface_factors %}
+                        <li>{{ factor }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+                <h2 class="text-xl font-semibold text-green-400 mb-4">Vulnerability Distribution by Severity</h2>
+                <canvas id="severity-chart" class="w-full h-64"></canvas>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+                <h2 class="text-xl font-semibold text-green-400 mb-4">Vulnerability Trend Over Time</h2>
+                <canvas id="trend-chart" class="w-full h-64"></canvas>
+            </div>
+        </section>
+
+        <!-- Filter by Severity -->
+        <section class="mb-6">
+            <form action="{{ url_for('index') }}" method="get" class="flex space-x-4">
+                <label for="severity" class="text-green-400 font-medium">Filter by Severity:</label>
+                <select name="severity" id="severity" class="border border-green-500 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-700 text-green-400">
+                    <option value="all" {% if selected_severity == 'all' %}selected{% endif %}>All</option>
+                    <option value="Critical" {% if selected_severity == 'Critical' %}selected{% endif %}>Critical</option>
+                    <option value="High" {% if selected_severity == 'High' %}selected{% endif %}>High</option>
+                    <option value="Medium" {% if selected_severity == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="Low" {% if selected_severity == 'Low' %}selected{% endif %}>Low</option>
+                    <option value="Informational" {% if selected_severity == 'Informational' %}selected{% endif %}>Informational</option>
+                </select>
+                <button type="submit" class="bg-green-600 text-gray-900 font-medium py-2 px-4 rounded-lg hover:bg-cyan-400 transition-colors glow-hover">Apply Filters</button>
+            </form>
+        </section>
+
+        <!-- Application Vulnerabilities -->
+        <section class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500 mb-6">
+            <h2 class="text-xl font-semibold text-green-400 mb-4">Application Vulnerabilities</h2>
+            <div class="overflow-x-auto">
+                <table id="app-vuln-table" class="min-w-full border-collapse text-sm">
+                    <thead class="bg-gray-600 text-green-400">
+                        <tr>
+                            <th class="border border-green-500 p-3 text-left cursor-pointer">Name</th>
+                            <th class="border border-green-500 p-3 text-left cursor-pointer">Severity</th>
+                            <th class="border border-green-500 p-3 text-left">Description</th>
+                            <th class="border border-green-500 p-3 text-left cursor-pointer">Risk Score</th>
+                            <th class="border border-green-500 p-3 text-left">Remediation</th>
+                            <th class="border border-green-500 p-3 text-left">Scan Date</th>
+                            <th class="border border-green-500 p-3 text-left">URL</th>
+                            <th class="border border-green-500 p-3 text-left">CWE ID</th>
+                            <th class="border border-green-500 p-3 text-left">Status</th>
+                            <th class="border border-green-500 p-3 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vuln in app_vulnerabilities %}
+                            <tr class="hover:bg-gray-700">
+                                <td class="border border-green-500 p-3">{{ vuln[1] }}</td>
+                                <td class="border border-green-500 p-3 {{ 'text-red-400' if vuln[2] == 'Critical' else 'text-orange-400' if vuln[2] == 'High' else 'text-yellow-400' if vuln[2] == 'Medium' else 'text-green-400' }}">{{ vuln[2] }}</td>
+                                <td class="border border-green-500 p-3">{{ vuln[3] }}</td>
+                                <td class="border border-green-500 p-3">{{ vuln[4] }}</td>
+                                <td class="border border-green-500 p-3">{{ vuln[5] }}</td>
+                                <td class="border border-green-500 p-3">{{ vuln[6] }}</td>
+                                <td class="border border-green-500 p-3">
+                                    {% if vuln[7] %}
+                                        <a href="{{ vuln[7] }}" target="_blank" class="text-cyan-400 hover:underline">{{ vuln[7] }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="border border-green-500 p-3">
+                                    {% if vuln[8] %}
+                                        <a href="https://cwe.mitre.org/data/definitions/{{ vuln[8] }}.html" target="_blank" class="text-cyan-400 hover:underline">{{ vuln[8] }}</a>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td class="border border-green-500 p-3">{{ vuln[9] }}</td>
+                                <td class="border border-green-500 p-3 space-x-2">
+                                    {% if vuln[9] != 'Fixed' %}
+                                        <form action="{{ url_for('quick_fix', id=vuln[0]) }}" method="post" class="inline">
+                                            <button type="submit" class="bg-green-600 text-gray-900 font-medium py-1 px-2 rounded-lg hover:bg-cyan-400 transition-colors glow-hover">Quick Fix</button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('delete', id=vuln[0], type='app') }}" onclick="return confirm('Are you sure you want to delete this vulnerability?');" class="bg-red-600 text-gray-900 font-medium py-1 px-2 rounded-lg hover:bg-cyan-400 transition-colors glow-hover">Delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 p-4 text-center text-green-400 mt-6 shadow-inner border-t border-green-500">
+        <p>Web Application Vulnerability Evaluator and Rectifier Powered by ThreadFix and Attack Surface Calculator</p>
+        <p class="text-sm">Version 1.0 | © 2025 Dhansuh Kumar | Licensed under MIT | <a href="https://owasp.org/www-project-zap/" target="_blank" class="text-cyan-400 hover:underline">OWASP ZAP</a></p>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('bg-gray-900');
+            body.classList.toggle('text-green-400');
+            body.classList.toggle('bg-gray-100');
+            body.classList.toggle('text-gray-800');
+        });
+
+        // Fetch chart data and render charts
+        fetch('/summary')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('severity-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            label: 'Vulnerabilities by Severity',
+                            data: Object.values(data),
+                            backgroundColor: ['#ff4d4f', '#ff7f0e', '#ffeb3b', '#52c41a', '#1890ff'],
+                            borderColor: ['#ff4d4f', '#ff7f0e', '#ffeb3b', '#52c41a', '#1890ff'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            });
+
+        fetch('/trend')
+            .then(response => response.json())
+            .then(data => {
+                const ctx = document.getElementById('trend-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [{
+                            label: 'Vulnerability Count Over Time',
+                            data: data.counts,
+                            borderColor: '#1890ff',
+                            backgroundColor: 'rgba(24, 144, 255, 0.2)',
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            });
+
+        // Table Sorting
+        const appTable = document.getElementById('app-vuln-table');
+
+        function sortTable(table, colIndex, type) {
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const isAscending = table.querySelectorAll('th')[colIndex].classList.toggle('sorted-asc');
+
+            rows.sort((a, b) => {
+                let aValue = a.cells[colIndex].textContent.trim();
+                let bValue = b.cells[colIndex].textContent.trim();
+
+                if (type === 'number') {
+                    aValue = parseFloat(aValue) || 0;
+                    bValue = parseFloat(bValue) || 0;
+                }
+
+                if (isAscending) {
+                    return aValue > bValue ? 1 : -1;
+                } else {
+                    return aValue < bValue ? 1 : -1;
+                }
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Add click event listeners for sortable columns in app vulnerabilities table
+        appTable.querySelectorAll('th').forEach((th, index) => {
+            if (th.classList.contains('cursor-pointer')) {
+                th.addEventListener('click', () => {
+                    const type = index === 4 ? 'number' : 'string'; // Risk Score is a number
+                    sortTable(appTable, index, type);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

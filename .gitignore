@@ -1,0 +1,15 @@
+# Python virtual environment
+venv/
+
+# SQLite database
+vulnerabilities.db
+
+# Log files
+threadsentry.log
+
+# Bytecode and cache files
+__pycache__/
+*.pyc
+
+# macOS metadata files
+.DS_Store

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreadSentry - Remediation History</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body class="bg-gray-900 text-green-400 font-mono">
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="ThreadSentry Logo" class="h-8 w-8">
+                <h1 class="text-2xl font-semibold text-green-400">ThreadSentry</h1>
+            </div>
+            <nav class="space-x-6 flex items-center">
+                <a href="{{ url_for('index') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Dashboard</a>
+                <a href="{{ url_for('upload') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Upload Report</a>
+                <a href="{{ url_for('export_report') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Export Report</a>
+                <a href="{{ url_for('remediation_history') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Remediation History</a>
+                <button id="theme-toggle" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Toggle Theme</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <!-- Remediation History -->
+        <section class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
+            <h2 class="text-xl font-semibold text-green-400 mb-4">Remediation History</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse text-sm">
+                    <thead class="bg-gray-600 text-green-400">
+                        <tr>
+                            <th class="border border-green-500 p-3 text-left">Vulnerability Name</th>
+                            <th class="border border-green-500 p-3 text-left">Type</th>
+                            <th class="border border-green-500 p-3 text-left">Action</th>
+                            <th class="border border-green-500 p-3 text-left">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in history %}
+                            <tr class="hover:bg-gray-700">
+                                <td class="border border-green-500 p-3">{{ entry[1] }}</td>
+                                <td class="border border-green-500 p-3">{{ entry[2] }}</td>
+                                <td class="border border-green-500 p-3">{{ entry[3] }}</td>
+                                <td class="border border-green-500 p-3">{{ entry[4] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a href="{{ url_for('index') }}" class="text-green-400 hover:text-cyan-400 mt-4 inline-block glow-hover">Back to Dashboard</a>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 p-4 text-center text-green-400 mt-6 shadow-inner border-t border-green-500">
+        <p>Web Application Vulnerability Evaluator and Rectifier Powered by ThreadFix and Attack Surface Calculator</p>
+        <p class="text-sm">Version 1.0 | © 2025 Dhansuh Kumar | Licensed under MIT | <a href="https://owasp.org/www-project-zap/" target="_blank" class="text-cyan-400 hover:underline">OWASP ZAP</a> | <a href="https://nmap.org/" target="_blank" class="text-cyan-400 hover:underline">Nmap</a></p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('bg-gray-900');
+            body.classList.toggle('text-green-400');
+            body.classList.toggle('bg-gray-100');
+            body.classList.toggle('text-gray-800');
+        });
+    </script>
+</body>
+</html>

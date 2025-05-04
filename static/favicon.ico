@@ -1,0 +1,32 @@
+import { useState } from 'react';
+import { Shield, AlertTriangle } from 'lucide-react';
+
+// A simple security-themed icon that could be used as a favicon
+export default function SecurityIcon() {
+  const [hovered, setHovered] = useState(false);
+  
+  return (
+    <div className="flex flex-col items-center justify-center p-4 bg-gray-100 rounded-md">
+      <div 
+        className="relative"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <Shield 
+          size={64} 
+          className={`text-blue-600 ${hovered ? 'animate-pulse' : ''}`} 
+          strokeWidth={2} 
+        />
+        <AlertTriangle 
+          size={32} 
+          className="text-yellow-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" 
+          strokeWidth={2.5} 
+        />
+      </div>
+      <div className="mt-4 text-sm text-center text-gray-700">
+        <p>Security icon for MiniVulnManager</p>
+        <p className="text-xs mt-2">Download this as SVG and convert to favicon.ico</p>
+      </div>
+    </div>
+  );
+}
