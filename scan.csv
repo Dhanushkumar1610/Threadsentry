@@ -1,4 +1,2 @@
 name,severity,description,risk_score,remediation,url,cwe_id
-XSS,High,Cross-site scripting,80,Implement input sanitization,https://example.com/login,79
-SQL Injection,Critical,Permits unauthorized database access,95,Use parameterized queries,https://example.com/api/users,89
-CSRF,Medium,Enables unauthorized actions,60,Implement CSRF tokens,https://example.com/update,352
+XSS Vulnerability,High,Cross-site scripting in login form,70,Use input sanitization,https://example.com/login,CWE-79

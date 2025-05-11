@@ -114,6 +114,7 @@
                             <th class="border border-green-500 p-3 text-left">URL</th>
                             <th class="border border-green-500 p-3 text-left">CWE ID</th>
                             <th class="border border-green-500 p-3 text-left">Status</th>
+                            <th class="border border-green-500 p-3 text-left">Source Tool</th>
                             <th class="border border-green-500 p-3 text-left">Actions</th>
                         </tr>
                     </thead>
@@ -141,6 +142,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="border border-green-500 p-3">{{ vuln[9] }}</td>
+                                <td class="border border-green-500 p-3">{{ vuln[10] }}</td>
                                 <td class="border border-green-500 p-3 space-x-2">
                                     {% if vuln[9] != 'Fixed' %}
                                         <form action="{{ url_for('quick_fix', id=vuln[0]) }}" method="post" class="inline">
@@ -250,11 +252,10 @@
             rows.forEach(row => tbody.appendChild(row));
         }
 
-        // Add click event listeners for sortable columns in app vulnerabilities table
         appTable.querySelectorAll('th').forEach((th, index) => {
             if (th.classList.contains('cursor-pointer')) {
                 th.addEventListener('click', () => {
-                    const type = index === 4 ? 'number' : 'string'; // Risk Score is a number
+                    const type = index === 4 ? 'number' : 'string';
                     sortTable(appTable, index, type);
                 });
             }
