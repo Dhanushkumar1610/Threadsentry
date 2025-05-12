@@ -1,0 +1,10 @@
+{
+    "issues": [
+        {
+            "type": "VULNERABILITY",
+            "message": "SQL Injection risk in query construction",
+            "severity": "CRITICAL",
+            "component": "app/src/main.java"
+        }
+    ]
+}

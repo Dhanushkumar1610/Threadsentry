@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysis xmlns="https://jeremylong.github.io/DependencyCheck/dependency-check.2.2.xsd">
+    <dependency>
+        <fileName>example.jar</fileName>
+        <vulnerabilities>
+            <vulnerability>
+                <name>CVE-2023-1234</name>
+                <severity>High</severity>
+                <description>A critical vulnerability</description>
+            </vulnerability>
+        </vulnerabilities>
+    </dependency>
+</analysis>

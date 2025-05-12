@@ -1,0 +1,14 @@
+{
+    "results": [
+        {
+            "test_id": "B101",
+            "issue_severity": "HIGH",
+            "issue_text": "Use of assert detected",
+            "filename": "example.py",
+            "more_info": "See Bandit documentation"
+        }
+    ],
+    "metrics": {
+        "loc": 100
+    }
+}
