@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues burpVersion="2021.8">
+    <issue>
+        <name>Cross-site scripting</name>
+        <severity>High</severity>
+        <issueDetail>Reflected XSS in parameter</issueDetail>
+        <remediation>Sanitize inputs</remediation>
+        <host>https://example.com</host>
+    </issue>
+</issues>

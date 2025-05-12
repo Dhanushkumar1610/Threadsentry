@@ -1,0 +1,2 @@
+name,severity,description,risk_score,remediation,url,cwe_id
+XSS Vulnerability,High,Cross-site scripting in login form,70,Use input sanitization,https://example.com/login,CWE-79
