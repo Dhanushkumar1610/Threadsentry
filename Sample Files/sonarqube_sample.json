@@ -1,10 +1,14 @@
 {
-    "issues": [
+    "dependencies": [
         {
-            "type": "VULNERABILITY",
-            "message": "SQL Injection risk in query construction",
-            "severity": "CRITICAL",
-            "component": "app/src/main.java"
+            "fileName": "example.jar",
+            "vulnerabilities": [
+                {
+                    "name": "CVE-2023-1234",
+                    "severity": "High",
+                    "description": "A critical vulnerability in example.jar"
+                }
+            ]
         }
     ]
 }

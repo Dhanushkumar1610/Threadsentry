@@ -1,0 +1,3 @@
+vulnerability,risk,description
+"Missing Header
+"Cross-Site Scripting,High,Unclosed quote in description

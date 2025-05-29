@@ -3,161 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThreadSentry - Upload Report</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Upload Vulnerability Report - ThreadSentry</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Roboto Mono) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABgklEQVRYR+2WvUoDQRSFvzMECyNYWNgE7TwA3cIiuHQtPIW1tQ1IF2ltbS2EHYTQzszuLLszs5u1uwhaSGmA4F8mJIHLvXfv3bt3bwcGBgZGR0dLhUJBKpWKXC5XotFozc/PZ3d3d1AoFBRFUVFRkclkCofDgbIsB1EUdVqtthqNxuVyOaPRaFwuF1mWZTQaK4qiiqLo6upqPB6P9XrdYrFYtFotFovlcrkcx3G5XI5GI+FwOKzX6/39/dPpNEqlEslkEqlU6u7ubjabDc/zWq1WKBQKh8N+v9/v9zudTqfT6bBer2ez2dFoNDabzXa7XbPZbG63W63W2Wy2XC5Ho9HYbDYajcZisVgsFovFYrFYLBbr9XrXarUmk0nR6XQmk0nxeDxutVqtra2tVqs1m82tra2trKwsy7Isy7K6urpqtVqtVmt1dXVRVFXV7/dVVVWv1+v1ej2fz+fn5+fz+ezs7NDQ0NDQ0NDQ0NDIyMjIyMjIyMjIyMjIyMjIyMjI6KioqND/AK0mB1w8nXgAAAAASUVORK5CYII=">
+    <style>
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        /* Neon Glow Effect */
+        .neon-glow {
+            box-shadow: 0 0 10px #00f7ff, 0 0 20px #00f7ff;
+        }
+        .neon-glow:hover {
+            box-shadow: 0 0 15px #00f7ff, 0 0 30px #00f7ff;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f7ff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d4ff;
+        }
+        /* Fade-in Animation for Flash Messages */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .flash-message {
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-green-400 font-mono">
-    <!-- Header -->
-    <header class="bg-gray-800 shadow-lg p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <img src="{{ url_for('static', filename='logo.png') }}" alt="ThreadSentry Logo" class="h-8 w-8">
-                <h1 class="text-2xl font-semibold text-green-400">ThreadSentry</h1>
-            </div>
-            <nav class="space-x-6 flex items-center">
-                <a href="{{ url_for('index') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Dashboard</a>
-                <a href="{{ url_for('upload') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Upload Report</a>
-                <a href="{{ url_for('export_report') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Export Report</a>
-                <a href="{{ url_for('remediation_history') }}" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Remediation History</a>
-                <button id="theme-toggle" class="text-green-400 hover:text-cyan-400 font-medium transition-colors glow-hover">Toggle Theme</button>
+<body class="text-gray-200">
+    <!-- Top Bar -->
+    <header class="bg-gray-900 p-4 flex justify-between items-center shadow-lg">
+        <h1 class="text-2xl font-bold text-cyan-400">ThreadSentry</h1>
+    </header>
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-900 shadow-lg">
+            <nav class="mt-6">
+                <a href="{{ url_for('index') }}" class="block py-3 px-6 text-gray-200 hover:bg-gray-800 hover:text-cyan-400 transition flex items-center space-x-2">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('upload_file') }}" class="block py-3 px-6 text-gray-200 hover:bg-gray-800 hover:text-cyan-400 transition flex items-center space-x-2">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Report</span>
+                </a>
+                <a href="{{ url_for('remediation_history') }}" class="block py-3 px-6 text-gray-200 hover:bg-gray-800 hover:text-cyan-400 transition flex items-center space-x-2">
+                    <i class="fas fa-history"></i>
+                    <span>Remediation History</span>
+                </a>
+                <a href="{{ url_for('analytics') }}" class="block py-3 px-6 text-gray-200 hover:bg-gray-800 hover:text-cyan-400 transition flex items-center space-x-2">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </a>
             </nav>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto p-6">
-        <!-- Flash Messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="bg-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' }}-800 border border-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' }}-400 text-{{ 'green' if category == 'success' else 'red' if category == 'error' else 'yellow' }}-400 px-4 py-3 rounded mb-4">
-                        {{ message }}
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <h1 class="text-3xl font-semibold text-cyan-400 mb-6">Upload Vulnerability Report</h1>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="mb-6">
+                        {% for message in messages %}
+                            <div class="p-4 rounded glass text-white border border-cyan-400 flash-message {% if 'Error' in message %}border-red-400{% else %}border-green-400{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-
-        <!-- Upload Form -->
-        <section class="bg-gray-800 p-6 rounded-lg shadow-lg border border-green-500">
-            <h2 class="text-xl font-semibold text-green-400 mb-4">Upload Vulnerability Report</h2>
-            <p class="text-green-400 mb-4">Upload a report file from supported tools: OWASP ZAP (CSV), Burp Suite (XML), OWASP Dependency-Check (XML/JSON), SonarQube (JSON), or Bandit (JSON).</p>
-            <form id="upload-form" method="post" enctype="multipart/form-data" class="space-y-4">
-                <div>
-                    <label for="file" class="block text-green-400 font-medium mb-2">Select File (CSV, XML, or JSON):</label>
-                    <input type="file" name="file" id="file" accept=".csv,.xml,.json" required class="border border-green-500 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-gray-700 text-green-400">
-                </div>
-                <div id="file-preview" class="hidden bg-gray-700 p-4 rounded-lg mt-4">
-                    <h3 class="text-lg font-semibold text-green-400 mb-2">File Preview (First 5 Entries)</h3>
-                    <div class="overflow-x-auto">
-                        <table id="preview-table" class="min-w-full border-collapse text-sm">
-                            <thead id="preview-head" class="bg-gray-600 text-green-400"></thead>
-                            <tbody id="preview-body"></tbody>
-                        </table>
+                {% endif %}
+            {% endwith %}
+            <!-- Upload Form -->
+            <div class="glass p-6 rounded-lg">
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label for="file" class="block text-cyan-400 font-medium mb-2">Select a report file (CSV, XML, JSON, PDF, or HTML):</label>
+                        <input type="file" name="file" id="file" accept=".csv,.xml,.json,.pdf,.html" class="w-full bg-gray-800 text-gray-200 p-2 rounded border border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 neon-glow">
                     </div>
-                </div>
-                <div class="relative pt-2">
-                    <div id="progress-bar" class="hidden w-full bg-gray-600 h-2 rounded">
-                        <div id="progress" class="bg-cyan-400 h-2 rounded" style="width: 0%"></div>
+                    <div>
+                        <input type="submit" value="Upload" class="bg-cyan-500 text-white font-medium py-2 px-4 rounded neon-glow transition">
                     </div>
-                </div>
-                <button type="submit" id="upload-button" class="bg-green-600 text-gray-900 font-medium py-2 px-4 rounded-lg hover:bg-cyan-400 transition-colors glow-hover">Upload</button>
-            </form>
-            <a href="{{ url_for('index') }}" class="text-green-400 hover:text-cyan-400 mt-4 inline-block glow-hover">Back to Dashboard</a>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 p-4 text-center text-green-400 mt-6 shadow-inner border-t border-green-500">
-        <p>Web Application Vulnerability Evaluator and Rectifier Powered by ThreadFix and Attack Surface Calculator</p>
-        <p class="text-sm">Version 1.0 | © 2025 Dhansuh Kumar | Licensed under MIT | <a href="https://owasp.org/www-project-zap/" target="_blank" class="text-cyan-400 hover:underline">OWASP ZAP</a></p>
-    </footer>
-
-    <script>
-        const fileInput = document.getElementById('file');
-        const previewDiv = document.getElementById('file-preview');
-        const previewHead = document.getElementById('preview-head');
-        const previewBody = document.getElementById('preview-body');
-        const form = document.getElementById('upload-form');
-        const progressBar = document.getElementById('progress-bar');
-        const progress = document.getElementById('progress');
-        const uploadButton = document.getElementById('upload-button');
-
-        fileInput.addEventListener('change', () => {
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            const filename = file.name.toLowerCase();
-            if (filename.endsWith('.csv')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const text = e.target.result;
-                    const rows = text.split('\n').filter(row => row.trim());
-                    if (rows.length === 0) return;
-
-                    const headers = rows[0].split(',').map(h => h.trim());
-                    previewHead.innerHTML = '<tr>' + headers.map(h => `<th class="border border-green-500 p-3 text-left">${h}</th>`).join('') + '</tr>';
-                    
-                    previewBody.innerHTML = '';
-                    const maxRows = Math.min(5, rows.length - 1);
-                    for (let i = 1; i <= maxRows; i++) {
-                        const cols = rows[i].split(',').map(c => c.trim());
-                        previewBody.innerHTML += '<tr>' + cols.map(c => `<td class="border border-green-500 p-3">${c}</td>`).join('') + '</tr>';
-                    }
-                    previewDiv.classList.remove('hidden');
-                };
-                reader.readAsText(file);
-            } else if (filename.endsWith('.xml') || filename.endsWith('.json')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const text = e.target.result;
-                    let data;
-                    if (filename.endsWith('.xml')) {
-                        // Simplified XML preview (just show a few fields)
-                        previewHead.innerHTML = '<tr><th class="border border-green-500 p-3 text-left">Sample Data</th></tr>';
-                        previewBody.innerHTML = `<tr><td class="border border-green-500 p-3">XML content loaded (preview not fully supported)</td></tr>`;
-                    } else {
-                        data = JSON.parse(text);
-                        const keys = Object.keys(data);
-                        previewHead.innerHTML = '<tr><th class="border border-green-500 p-3 text-left">Key</th><th class="border border-green-500 p-3 text-left">Value</th></tr>';
-                        previewBody.innerHTML = '';
-                        const maxRows = Math.min(5, keys.length);
-                        for (let i = 0; i < maxRows; i++) {
-                            previewBody.innerHTML += `<tr><td class="border border-green-500 p-3">${keys[i]}</td><td class="border border-green-500 p-3">${JSON.stringify(data[keys[i]]).substring(0, 50)}...</td></tr>`;
-                        }
-                    }
-                    previewDiv.classList.remove('hidden');
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            progressBar.classList.remove('hidden');
-            uploadButton.disabled = true;
-            let width = 0;
-            const interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    form.submit();
-                } else {
-                    width += 10;
-                    progress.style.width = width + '%';
-                }
-            }, 200);
-        });
-
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('bg-gray-900');
-            body.classList.toggle('text-green-400');
-            body.classList.toggle('bg-gray-100');
-            body.classList.toggle('text-gray-800');
-        });
-    </script>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

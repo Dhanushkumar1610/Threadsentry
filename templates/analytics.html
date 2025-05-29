@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ThreadSentry Dashboard</title>
+    <title>Analytics - ThreadSentry</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts (Roboto Mono) -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABgklEQVRYR+2WvUoDQRSFvzMECyNYWNgE7TwA3cIiuHQtPIW1tQ1IF2ltbS2EHYTQzszuLLszs5u1uwhaSGmA4F8mJIHLvXfv3bt3bwcGBgZGR0dLhUJBKpWKXC5XotFozc/PZ3d3d1AoFBRFUVFRkclkCofDgbIsB1EUdVqtthqNxuVyOaPRaFwuF1mWZTQaK4qiiqLo6upqPB6P9XrdYrFYtFotFovlcrkcx3G5XI5GI+FwOKzX6/39/dPpNEqlEslkEqlU6u7ubjabDc/zWq1WKBQKh8N+v9/v9zudTqfT6bBer2ez2dFoNDabzXa7XbPZbG63W63W2Wy2XC5Ho9HYbDYajcZisVgsFovFYrFYLBbr9XrXarUmk0nR6XQmk0nxeDxutVqtra2tVqs1m82tra2trKwsy7Isy7K6urpqtVqtVmt1dXVRVFXV7/dVVVWv1+v1ej2fz+fn5+fz+ezs7NDQ0NDQ0NDQ0NDIyMjIyMjIyMjIyMjIyMjIyMjI6KioqND/AK0mB1w8nXgAAAAASUVORK5CYII=">
     <style>
@@ -44,14 +46,6 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #00d4ff;
-        }
-        /* Sticky Table Header */
-        th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: #2a2a4e;
-            border-bottom: 2px solid #00f7ff;
         }
         /* Fade-in Animation for Flash Messages */
         @keyframes fadeIn {
@@ -92,7 +86,7 @@
         </div>
         <!-- Main Content -->
         <div class="flex-1 p-8">
-            <h1 class="text-3xl font-semibold text-cyan-400 mb-6">Dashboard</h1>
+            <h1 class="text-3xl font-semibold text-cyan-400 mb-6">Analytics</h1>
             <!-- Flash Messages -->
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -105,61 +99,59 @@
                     </div>
                 {% endif %}
             {% endwith %}
-            <!-- Export Form -->
-            <div class="mb-6 flex items-center space-x-4">
-                <label for="export-format" class="text-cyan-400 font-medium">Export Report:</label>
-                <select id="export-format" onchange="window.location.href='{{ url_for('export_report') }}?format='+this.value" class="bg-gray-800 text-gray-200 p-2 rounded border border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 neon-glow">
-                    <option value="csv">CSV</option>
-                    <option value="json">JSON</option>
-                    <option value="excel">Excel</option>
-                    <option value="pdf">PDF</option>
-                </select>
-            </div>
-            <!-- Vulnerabilities Table -->
-            <div class="glass rounded-lg overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr>
-                            <th class="p-4 text-left text-cyan-400">ID</th>
-                            <th class="p-4 text-left text-cyan-400">Name</th>
-                            <th class="p-4 text-left text-cyan-400">Severity</th>
-                            <th class="p-4 text-left text-cyan-400">Description</th>
-                            <th class="p-4 text-left text-cyan-400">Risk Score</th>
-                            <th class="p-4 text-left text-cyan-400">Remediation</th>
-                            <th class="p-4 text-left text-cyan-400">Scan Date</th>
-                            <th class="p-4 text-left text-cyan-400">URL</th>
-                            <th class="p-4 text-left text-cyan-400">CWE ID</th>
-                            <th class="p-4 text-left text-cyan-400">Status</th>
-                            <th class="p-4 text-left text-cyan-400">Source Tool</th>
-                            <th class="p-4 text-left text-cyan-400">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for vuln in vulnerabilities %}
-                            <tr class="border-t border-cyan-400/20 hover:bg-gray-800/50">
-                                <td class="p-4">{{ vuln[0] }}</td>
-                                <td class="p-4">{{ vuln[1] }}</td>
-                                <td class="p-4 {{ 'text-red-400' if vuln[2] == 'Critical' else 'text-orange-400' if vuln[2] == 'High' else 'text-yellow-400' if vuln[2] == 'Medium' else 'text-green-400' if vuln[2] == 'Low' else 'text-blue-400' }}">{{ vuln[2] }}</td>
-                                <td class="p-4">{{ vuln[3] }}</td>
-                                <td class="p-4">{{ vuln[4] }}</td>
-                                <td class="p-4">{{ vuln[5] }}</td>
-                                <td class="p-4">{{ vuln[6] }}</td>
-                                <td class="p-4">{{ vuln[7] }}</td>
-                                <td class="p-4">{{ vuln[8] }}</td>
-                                <td class="p-4">{{ vuln[9] }}</td>
-                                <td class="p-4">{{ vuln[10] }}</td>
-                                <td class="p-4 space-x-2">
-                                    {% if vuln[9] != 'Fixed' %}
-                                        <a href="{{ url_for('fix_vulnerability', vuln_id=vuln[0]) }}" class="inline-block bg-cyan-500 text-white px-3 py-1 rounded neon-glow transition">Mark as Fixed</a>
-                                    {% endif %}
-                                    {% if vuln[9] != 'Deleted' %}
-                                        <a href="{{ url_for('delete_vulnerability', vuln_id=vuln[0]) }}" class="inline-block bg-red-500 text-white px-3 py-1 rounded neon-glow transition">Delete</a>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <!-- Status Pie Chart -->
+            <div class="glass p-6 rounded-lg mb-6">
+                <h2 class="text-xl font-semibold text-cyan-400 mb-4">Vulnerability Status Distribution</h2>
+                <canvas id="statusChart" width="400" height="400"></canvas>
+                <script>
+                    const ctx = document.getElementById('statusChart').getContext('2d');
+                    const statusChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Open', 'Fixed', 'Deleted'],
+                            datasets: [{
+                                data: [
+                                    {{ status_counts['Open'] }},
+                                    {{ status_counts['Fixed'] }},
+                                    {{ status_counts['Deleted'] }}
+                                ],
+                                backgroundColor: [
+                                    '#00f7ff', // Neon Cyan for Open
+                                    '#22c55e', // Green for Fixed
+                                    '#ef4444'  // Red for Deleted
+                                ],
+                                borderColor: '#1a1a2e',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        font: {
+                                            family: 'Roboto Mono',
+                                            size: 14
+                                        },
+                                        color: '#e5e7eb'
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(26, 26, 46, 0.8)',
+                                    titleFont: {
+                                        family: 'Roboto Mono'
+                                    },
+                                    bodyFont: {
+                                        family: 'Roboto Mono'
+                                    },
+                                    borderColor: '#00f7ff',
+                                    borderWidth: 1
+                                }
+                            }
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>

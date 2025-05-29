@@ -1,0 +1,6 @@
+ID,Title,Severity,CVSS Score,Description,Asset,Port,Protocol,Status,Remediation
+VULN-001,Clickjacking on Login Page,Low,3.5,The login page does not have X-Frame-Options header.,webapp1.example.com,443,HTTPS,Open,Set X-Frame-Options to SAMEORIGIN.
+VULN-002,Server Banner Disclosure,Low,2.6,Web server discloses version in HTTP headers.,webapp2.example.com,80,HTTP,Open,Configure server to hide banner/version.
+VULN-003,Outdated JavaScript Library,Low,3.1,Uses jQuery 1.12.4 with known low-risk issues.,app.example.com,443,HTTPS,Open,Update to latest stable version of jQuery.
+VULN-004,Missing Security Headers,Low,3.0,Security headers like X-Content-Type-Options are missing.,portal.example.com,443,HTTPS,Open,Add recommended HTTP security headers.
+VULN-005,Information Disclosure via Robots.txt,Low,2.5,robots.txt reveals sensitive directory paths.,internal.example.com,443,HTTPS,Open,Remove or sanitize sensitive entries in robots.txt.
